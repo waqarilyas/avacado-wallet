@@ -3,15 +3,18 @@ import React from 'react';
 import {Text, ToastAndroid, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import styles from './styles';
 import {useWallet} from '../../context/walletContext';
+import styles from './styles';
 
 const EOAScreen = ({navigation}: any) => {
-  const {handleWalletGeneration, wallet, tokenBalances} = useWallet();
-
-  const handleTransferPress = () => {
-    // Add your logic for the "Transfer All To Avocado" button here
-  };
+  const {
+    handleWalletGeneration,
+    wallet,
+    tokenBalances,
+    handleFundsTransferToAvocado,
+    loading,
+    creationLoading
+  } = useWallet();
 
   const handleCopy = () => {
     Clipboard.setString(wallet?.address || '');
@@ -39,13 +42,17 @@ const EOAScreen = ({navigation}: any) => {
 
         <TouchableOpacity
           style={styles.customButton}
-          onPress={handleTransferPress}>
-          <Text style={styles.customButtonText}>Transfer All To Avocado</Text>
+          onPress={handleFundsTransferToAvocado}>
+          <Text style={styles.customButtonText}>
+            {loading ? 'Sending Funds...' : 'Transfer All To Avocado'}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.customButton}
-          onPress={handleWalletGeneration}>
-          <Text style={styles.customButtonText}>Generate New Wallet</Text>
+          onPress={() => handleWalletGeneration()}>
+          <Text style={styles.customButtonText}>
+            {creationLoading ? 'Creating Wallet...' : 'Generate New Wallet'}
+          </Text>
         </TouchableOpacity>
       </View>
 

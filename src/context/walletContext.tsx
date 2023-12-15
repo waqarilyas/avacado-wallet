@@ -1,11 +1,12 @@
+import {HDNodeWallet} from 'ethers';
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import {ToastAndroid} from 'react-native';
+import {sendSdkTransaction} from '../utils/wallet-sdk-setup';
 import {
   createAvocadoWallet,
   fetchTokenBalances,
   generateNewWallet
 } from '../utils/wallet.util';
-import {HDNodeWallet} from 'ethers';
 
 interface WalletContextProps {
   wallet: HDNodeWallet | undefined;
@@ -19,7 +20,10 @@ interface WalletContextProps {
     aDai: string;
   };
   handleWalletGeneration: () => Promise<void>;
+  handleFundsTransferToAvocado: () => Promise<void>;
   avocadoWallet: string;
+  loading: boolean;
+  creationLoading: boolean;
 }
 
 const WalletContext = createContext<WalletContextProps>({
@@ -34,13 +38,17 @@ const WalletContext = createContext<WalletContextProps>({
     aDai: '0'
   },
   handleWalletGeneration: async () => {},
-  avocadoWallet: ''
+  avocadoWallet: '',
+  handleFundsTransferToAvocado: async () => {},
+  loading: false,
+  creationLoading: false
 });
 
 const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   const [wallet, setWallet] = useState<HDNodeWallet | undefined>(undefined);
   const [avocadoWallet, setAvocadoWallet] = useState<string>();
-
+  const [loading, setLoading] = useState(false);
+  const [creationLoading, setCreationLoading] = useState(false);
   const [tokenBalances, setTokenBalances] = useState({
     polygon: '0',
     opt: '0',
@@ -51,21 +59,41 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   });
 
   const handleWalletGeneration = async () => {
-    const newWallet = generateNewWallet();
-    setWallet(newWallet);
+    try {
+      setCreationLoading(true);
+      const newWallet = generateNewWallet();
+      setWallet(newWallet);
+      const balances = await fetchTokenBalances(newWallet.address);
+      setTokenBalances(balances);
 
-    const balances = await fetchTokenBalances(newWallet.address);
-    setTokenBalances(balances);
+      const aWallet = await createAvocadoWallet(newWallet);
+      setAvocadoWallet(aWallet);
+      ToastAndroid.show(
+        'New Wallet Generated Successfully!',
+        ToastAndroid.SHORT
+      );
+    } catch (error) {
+      console.log(
+        '🚀 ~ file: walletContext.tsx:76 ~ handleWalletGeneration ~ error:',
+        error
+      );
+      ToastAndroid.show('Failed to generate new wallet', ToastAndroid.SHORT);
+    } finally {
+      setCreationLoading(false);
+    }
+  };
 
-    ToastAndroid.show('New Wallet Generated Successfully!', ToastAndroid.SHORT);
-
-    const aWallet = await createAvocadoWallet(newWallet);
-    console.log(
-      '🚀 ~ file: walletContext.tsx:61 ~ handleWalletGeneration ~ avocadoWallet:',
-      aWallet
-    );
-
-    setAvocadoWallet(aWallet);
+  const handleFundsTransferToAvocado = async () => {
+    try {
+      setLoading(true);
+      await sendSdkTransaction({
+        privateKey: wallet?.privateKey || '',
+        erc20ContractAddresses: ['0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48']
+      });
+    } catch (err) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -76,7 +104,10 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     handleWalletGeneration,
     wallet,
     tokenBalances,
-    avocadoWallet: avocadoWallet || ''
+    avocadoWallet: avocadoWallet || '',
+    handleFundsTransferToAvocado,
+    loading,
+    creationLoading
   };
 
   return (

@@ -23,9 +23,9 @@ const AvocadoScreen = ({navigation}: any) => {
         </TouchableOpacity>
 
         <View style={styles.middleText}>
-          <Text style={styles.text}>USDC (Polygon): 24</Text>
-          <Text style={styles.text}>DAI (Arb): 24</Text>
-          <Text style={styles.text}>USDT (Opt): 74</Text>
+          <Text style={styles.text}>USDC (Polygon): 0</Text>
+          <Text style={styles.text}>DAI (Arb): 0</Text>
+          <Text style={styles.text}>USDT (Opt): 0</Text>
         </View>
       </View>
 

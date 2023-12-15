@@ -18,7 +18,8 @@ const styles = StyleSheet.create({
   },
   addressText: {
     fontSize: 14,
-    letterSpacing: 1
+    letterSpacing: 1,
+    marginRight: 5
   },
   middleContainer: {
     flex: 1,
