@@ -6,7 +6,7 @@ import {useWallet} from '../../context/walletContext';
 import styles from './styles';
 
 const AvocadoScreen = ({navigation}: any) => {
-  const {avocadoWallet} = useWallet();
+  const {avocadoWallet, avocadoBalance} = useWallet();
 
   const handleCopy = () => {
     Clipboard.setString(avocadoWallet || '');
@@ -23,9 +23,9 @@ const AvocadoScreen = ({navigation}: any) => {
         </TouchableOpacity>
 
         <View style={styles.middleText}>
-          <Text style={styles.text}>USDC (Polygon): 0</Text>
-          <Text style={styles.text}>DAI (Arb): 0</Text>
-          <Text style={styles.text}>USDT (Opt): 0</Text>
+          <Text style={styles.text}>
+            USDC (Polygon): {avocadoBalance?.polygon}
+          </Text>
         </View>
       </View>
 

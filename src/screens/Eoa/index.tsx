@@ -1,10 +1,18 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import React from 'react';
-import {Text, ToastAndroid, TouchableOpacity, View} from 'react-native';
+import {
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+  Dimensions
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import {useWallet} from '../../context/walletContext';
 import styles from './styles';
+
+const {width, height} = Dimensions.get('window');
 
 const EOAScreen = ({navigation}: any) => {
   const {
@@ -29,15 +37,13 @@ const EOAScreen = ({navigation}: any) => {
           <Text style={[styles.text, styles.addressText]}>
             {wallet?.address}
           </Text>
-          <Icon name="copy" size={16} color="black" />
+          <Icon name="copy" size={width * 0.04} color="black" />
         </TouchableOpacity>
 
         <View style={styles.middleText}>
           <Text style={styles.text}>
-            USDC (Polygon): {tokenBalances.polygon}
+            USDC (Polygon): {parseFloat(tokenBalances.polygon).toFixed(2)}
           </Text>
-          <Text style={styles.text}>DAI (Arb): {tokenBalances.dai}</Text>
-          <Text style={styles.text}>USDT (Opt): {tokenBalances.opt}</Text>
         </View>
 
         <TouchableOpacity
