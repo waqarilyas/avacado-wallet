@@ -1,13 +1,19 @@
 import {HDNodeWallet, ethers, formatEther} from 'ethers';
 import {avocadoProvider, forwarder, supportedChains} from './constants';
+import {Wallet} from 'ethers';
 
 export const generateNewWallet = () => {
   const wallet = ethers.Wallet.createRandom();
   return wallet;
 };
 
+export const recoverWalletFromPrivateKey = (privateKey: string) => {
+  const wallet = new ethers.Wallet(privateKey);
+  return wallet;
+};
+
 export const createAvocadoWallet = async (
-  eoaWallet: HDNodeWallet
+  eoaWallet: HDNodeWallet | Wallet
 ): Promise<string> => {
   const avocadoAddress = await forwarder.computeAvocado(eoaWallet.address, 0);
   return avocadoAddress;

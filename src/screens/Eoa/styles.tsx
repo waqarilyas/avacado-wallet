@@ -1,10 +1,12 @@
-import {StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet} from 'react-native';
+const {width, height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    padding: 20
+    padding: 20,
+    height: height
   },
   text: {
     color: '#333',
@@ -67,6 +69,25 @@ const styles = StyleSheet.create({
   },
   marginText: {
     marginRight: 10
+  },
+  inputField: {
+    backgroundColor: '#ecf0f1',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    flex: 1,
+    marginRight: 10
+  },
+  inputContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  orText: {
+    marginBottom: 20,
+    fontWeight: 'bold',
+    fontSize: 18
   }
 });
 
