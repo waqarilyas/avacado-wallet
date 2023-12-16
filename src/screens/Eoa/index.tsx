@@ -61,7 +61,7 @@ const EOAScreen = ({navigation}: any) => {
             const value = key.split('-');
 
             return (
-              <Text style={styles.text}>
+              <Text style={styles.text} key={value[0]}>
                 {value[0]}: {parseFloat(tokenBalances[key]).toFixed(2)}{' '}
                 {value[1]}
               </Text>

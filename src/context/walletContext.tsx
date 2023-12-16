@@ -5,21 +5,17 @@ import {sendAllTokens} from '../utils/transactions.util';
 import {
   createAvocadoWallet,
   fetchAccountErc20Balances,
-  fetchAvoBalances,
   generateNewWallet
 } from '../utils/wallet.util';
 
 interface TokenBalances {
   [tokenName: string]: string;
 }
-interface AvocadoBalances {
-  polygon: string;
-}
 
 interface WalletContextProps {
   wallet: HDNodeWallet | undefined;
   tokenBalances: TokenBalances;
-  avocadoBalance: AvocadoBalances;
+  avocadoBalance: TokenBalances;
   handleWalletGeneration: () => Promise<void>;
   handleFundsTransferToAvocado: () => Promise<void>;
   avocadoWallet: string;
@@ -33,7 +29,12 @@ const DEFAULT_TOKEN_BALANCES: TokenBalances = {
   'optimism-USDT': '0',
   'arbitrum-USDT': '0'
 };
-const DEFAULT_AVOCADO_BALANCE: AvocadoBalances = {polygon: '0'};
+const DEFAULT_AVOCADO_BALANCE: TokenBalances = {
+  'polygon-USDC': '0',
+  'ethereum-USDT': '0',
+  'optimism-USDT': '0',
+  'arbitrum-USDT': '0'
+};
 
 const WalletContext = createContext<WalletContextProps>({
   wallet: undefined,
@@ -62,14 +63,15 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
         const newWallet = generateNewWallet();
         setWallet(newWallet);
 
-        handleAccountBalances();
         const aWallet = await createAvocadoWallet(newWallet);
         setAvocadoWallet(aWallet);
 
-        const avocadoBalances = await fetchAvoBalances(newWallet.address);
-        setAvocadoBalance({
-          polygon: avocadoBalances ?? DEFAULT_AVOCADO_BALANCE.polygon
-        });
+        const balances = await fetchAccountErc20Balances(newWallet.address);
+        setTokenBalances(balances);
+
+        const avocadoBalances = await fetchAccountErc20Balances(aWallet);
+        setAvocadoBalance(avocadoBalances);
+
         Toast.show({
           type: 'success',
           text1: 'Wallet Created',
@@ -95,10 +97,14 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     const balances = await fetchAccountErc20Balances(wallet.address);
     setTokenBalances(balances);
 
-    const avocadoBalances = await fetchAvoBalances(wallet.address);
-    setAvocadoBalance({
-      polygon: avocadoBalances ?? DEFAULT_AVOCADO_BALANCE.polygon
-    });
+    if (!avocadoWallet) return;
+    const avocadoBalances = await fetchAccountErc20Balances(avocadoWallet);
+    setAvocadoBalance(avocadoBalances);
+
+    // Toast.show({
+    //   type: 'success',
+    //   text1: 'Balance Updated'
+    // });
   };
 
   const handleFundsTransferToAvocado = async () => {
@@ -107,6 +113,7 @@ const WalletProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
 
       if (!wallet || !avocadoWallet) return;
       await sendAllTokens(wallet.privateKey, avocadoWallet);
+      handleAccountBalances();
     } catch (err) {
       // Handle the error if needed
     } finally {

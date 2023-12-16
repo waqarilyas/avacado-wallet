@@ -23,14 +23,23 @@ const AvocadoScreen = ({navigation}: any) => {
       <Text style={styles.heading}>Avocado Account</Text>
       <View style={styles.middleContainer}>
         <TouchableOpacity style={styles.copyContainer} onPress={handleCopy}>
-          <Text style={[styles.text, styles.addressText]}>{avocadoWallet}</Text>
+          <Text style={[styles.text, styles.addressText]}>
+            Address: {avocadoWallet}
+          </Text>
           <Icon name="copy" size={16} color="black" />
         </TouchableOpacity>
 
         <View style={styles.middleText}>
-          <Text style={styles.text}>
-            USDC (Polygon): {avocadoBalance?.polygon}
-          </Text>
+          {Object.keys(avocadoBalance).map(key => {
+            const value = key.split('-');
+
+            return (
+              <Text style={styles.text} key={value[0]}>
+                {value[0]}: {parseFloat(avocadoBalance[key]).toFixed(2)}{' '}
+                {value[1]}
+              </Text>
+            );
+          })}
         </View>
       </View>
 
