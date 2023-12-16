@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@ethersproject/shims": "^5.7.0",
-    "@instadapp/avocado": "^0.4.5",
     "@react-native-clipboard/clipboard": "^1.13.0",
     "@react-native-masked-view/masked-view": "^0.3.1",
     "@react-navigation/stack": "^6.3.20",
@@ -22,6 +21,7 @@
     "react-native-get-random-values": "^1.10.0",
     "react-native-safe-area-context": "^4.8.1",
     "react-native-screens": "^3.29.0",
+    "react-native-toast-message": "^2.2.0",
     "react-native-vector-icons": "^10.0.2"
   },
   "devDependencies": {

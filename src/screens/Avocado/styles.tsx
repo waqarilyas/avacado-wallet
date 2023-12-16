@@ -14,7 +14,9 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: '700',
     fontSize: 24,
-    marginBottom: 10
+    marginBottom: 10,
+    textAlign: 'center',
+    marginTop: 10
   },
   addressText: {
     fontSize: 14,

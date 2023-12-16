@@ -1,5 +1,5 @@
 import {HDNodeWallet, ethers, formatEther} from 'ethers';
-import {avocadoProvider, forwarder} from './constants';
+import {avocadoProvider, forwarder, supportedChains} from './constants';
 
 export const generateNewWallet = () => {
   const wallet = ethers.Wallet.createRandom();
@@ -13,22 +13,6 @@ export const createAvocadoWallet = async (
   return avocadoAddress;
 };
 
-export const fetchTokenBalances = async (
-  walletAddress: string
-): Promise<any> => {
-  const ploygonProvider = new ethers.JsonRpcProvider(
-    'https://polygon.llamarpc.com'
-  );
-
-  const polygonBalance = await ploygonProvider.getBalance(walletAddress);
-
-  const polyBalance = formatEther(polygonBalance);
-
-  return {
-    polygon: polyBalance?.toString()
-  };
-};
-
 export const fetchAvoBalances = async (walletAddress: string): Promise<any> => {
   const balance = await avocadoProvider.getBalance(walletAddress);
   const polyBalance = formatEther(balance);
@@ -36,51 +20,33 @@ export const fetchAvoBalances = async (walletAddress: string): Promise<any> => {
   return polyBalance;
 };
 
-export const test = async () => {
-  const forwarderABI = [
-    {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'owner_',
-          type: 'address'
-        },
-        {
-          internalType: 'uint32',
-          name: 'index_',
-          type: 'uint32'
-        }
-      ],
-      name: 'computeAvocado',
-      outputs: [
-        {
-          internalType: 'address',
-          name: '',
-          type: 'address'
-        }
-      ],
-      stateMutability: 'view',
-      type: 'function'
+export const fetchAccountErc20Balances = async (
+  walletAddress: string
+): Promise<{[tokenName: string]: string}> => {
+  const balances: {[tokenName: string]: string} = {};
+
+  for (const chain of supportedChains) {
+    const provider = new ethers.JsonRpcProvider(chain.rpc);
+
+    const tokens = chain.tokens;
+
+    for (const tokenName of Object.keys(tokens)) {
+      const tokenContract = new ethers.Contract(
+        tokens[tokenName],
+        ['function balanceOf(address account) view returns (uint256)'],
+        provider
+      );
+
+      const senderBalance = await tokenContract.balanceOf(walletAddress);
+      const formattedBalance = formatEther(senderBalance);
+
+      console.log(
+        `Balance for ${tokenName} on ${chain.name}: ${formattedBalance}`
+      );
+
+      balances[`${chain.name}-${tokenName}`] = formattedBalance;
     }
-  ];
+  }
 
-  const provider = new ethers.JsonRpcProvider('https://polygon.llamarpc.com');
-  const avoProvider = new ethers.JsonRpcProvider(
-    'https://rpc.avocado.instadapp.io'
-  );
-
-  const forwarderContractAddress = '0x46978CD477A496028A18c02F07ab7F35EDBa5A54';
-  const eoaAddress = '0x910E413DBF3F6276Fe8213fF656726bDc142E08E';
-
-  const contract = new ethers.Contract(
-    forwarderContractAddress,
-    forwarderABI,
-    provider
-  );
-
-  console.log(await contract.computeAvocado(eoaAddress, 0)); // New Multisig Personal
-
-  console.log(await contract.computeAvocado(eoaAddress, 1)); // New Multisig Multisig
-
-  console.log(await avoProvider.send('api_getSafes', [{address: eoaAddress}])); // All deployed safes
+  return balances;
 };

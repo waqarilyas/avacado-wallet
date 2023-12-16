@@ -1,6 +1,4 @@
-import {ethers} from 'ethers'; // ethers@v5
-import avoForwarderV1ABI from './avo-forwarder-v1-abi.json';
-import avoV1ABI from './avo-forwarder-v1-abi.json';
+import {ethers} from 'ethers';
 
 const forwarderABI = [
   {
@@ -29,17 +27,59 @@ const forwarderABI = [
   }
 ];
 
+const supportedChains = [
+  {
+    rpc: 'https://polygon.llamarpc.com',
+    chainId: 137,
+    name: 'Polygon',
+    tokens: {
+      USDC: '0x625E7708f30cA75bfd92586e17077590C60eb4cD'
+    }
+  },
+  {
+    rpc: 'https://ethereum.publicnode.com',
+    chainId: 1,
+    name: 'Ethereum',
+    tokens: {
+      USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7'
+    }
+  },
+  {
+    name: 'Optimism',
+    rpc: 'https://mainnet.optimism.io',
+    chainId: 10,
+    tokens: {
+      USDT: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58'
+    }
+  },
+  {
+    name: 'Arbitrum',
+    rpc: 'https://arb1.arbitrum.io/rpc',
+    chainId: 42161,
+    tokens: {
+      USDT: '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9'
+    }
+  }
+];
+
+const contractAddresses = {
+  ethereum: {
+    USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7'
+  },
+  polygon: {
+    USDC: '0x625E7708f30cA75bfd92586e17077590C60eb4cD'
+  }
+};
+
 const avocadoProvider = new ethers.JsonRpcProvider(
   'https://rpc.avocado.instadapp.io'
 );
-// can use any other RPC on the network you want to interact with:
-const polygonProvider = new ethers.JsonRpcProvider('https://polygon-rpc.com');
+const polygonProvider = new ethers.JsonRpcProvider(
+  'https://polygon.llamarpc.com'
+);
 
-const signer = avocadoProvider.getSigner();
+const avoForwarderAddress = '0x46978CD477A496028A18c02F07ab7F35EDBa5A54';
 
-const avoForwarderAddress = '0x46978CD477A496028A18c02F07ab7F35EDBa5A54'; // available on 10+ networks
-
-// set up AvoForwarder contract (main interaction point) on e.g. Polygon
 const forwarder = new ethers.Contract(
   avoForwarderAddress,
   forwarderABI,
@@ -47,10 +87,9 @@ const forwarder = new ethers.Contract(
 );
 
 export {
-  forwarder,
   avocadoProvider,
+  contractAddresses,
+  forwarder,
   polygonProvider,
-  signer,
-  avoForwarderV1ABI,
-  avoV1ABI
+  supportedChains
 };

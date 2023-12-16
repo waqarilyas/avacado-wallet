@@ -14,7 +14,9 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: '700',
     fontSize: 24,
-    marginBottom: 10
+    marginBottom: 10,
+    textAlign: 'center',
+    marginTop: 10
   },
   addressText: {
     fontSize: 14,
@@ -45,7 +47,10 @@ const styles = StyleSheet.create({
     shadowColor: '#000', // for iOS shadow
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
-    shadowRadius: 4
+    shadowRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   customButtonText: {
     color: 'white',
@@ -59,6 +64,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between'
+  },
+  marginText: {
+    marginRight: 10
   }
 });
 

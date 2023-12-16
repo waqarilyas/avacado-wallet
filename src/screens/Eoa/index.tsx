@@ -1,18 +1,19 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import React from 'react';
 import {
+  ActivityIndicator,
+  Dimensions,
   Text,
-  ToastAndroid,
   TouchableOpacity,
-  View,
-  Dimensions
+  View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import Toast from 'react-native-toast-message';
 import {useWallet} from '../../context/walletContext';
 import styles from './styles';
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const EOAScreen = ({navigation}: any) => {
   const {
@@ -24,41 +25,67 @@ const EOAScreen = ({navigation}: any) => {
     creationLoading
   } = useWallet();
 
-  const handleCopy = () => {
-    Clipboard.setString(wallet?.address || '');
-    ToastAndroid.show('Copied to clipboard', 500);
+  const handleCopy = (value: string | undefined) => {
+    Clipboard.setString(value || '');
+
+    Toast.show({
+      type: 'success',
+      text1: 'Copied to clipboard',
+      text2: value || ''
+    });
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.heading}>Externally Owned Account(EOA)</Text>
       <View style={styles.middleContainer}>
-        <Text style={styles.heading}>EOA</Text>
-        <TouchableOpacity style={styles.copyContainer} onPress={handleCopy}>
+        <TouchableOpacity
+          style={styles.copyContainer}
+          onPress={() => handleCopy(wallet?.privateKey)}>
           <Text style={[styles.text, styles.addressText]}>
-            {wallet?.address}
+            Address: {wallet?.address}
+          </Text>
+          <Icon name="copy" size={width * 0.04} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyContainer}
+          onPress={() => handleCopy(wallet?.privateKey)}>
+          <Text style={[styles.text, styles.addressText]}>
+            Private Key: {wallet?.privateKey}
           </Text>
           <Icon name="copy" size={width * 0.04} color="black" />
         </TouchableOpacity>
 
         <View style={styles.middleText}>
-          <Text style={styles.text}>
-            USDC (Polygon): {parseFloat(tokenBalances.polygon).toFixed(2)}
-          </Text>
+          {Object.keys(tokenBalances).map(key => {
+            const value = key.split('-');
+
+            return (
+              <Text style={styles.text}>
+                {value[0]}: {parseFloat(tokenBalances[key]).toFixed(2)}{' '}
+                {value[1]}
+              </Text>
+            );
+          })}
         </View>
 
         <TouchableOpacity
           style={styles.customButton}
           onPress={handleFundsTransferToAvocado}>
-          <Text style={styles.customButtonText}>
+          <Text style={[styles.customButtonText, styles.marginText]}>
             {loading ? 'Sending Funds...' : 'Transfer All To Avocado'}
           </Text>
+          {loading ? <ActivityIndicator size="small" color="white" /> : null}
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.customButton}
           onPress={() => handleWalletGeneration()}>
-          <Text style={styles.customButtonText}>
+          <Text style={[styles.customButtonText, styles.marginText]}>
             {creationLoading ? 'Creating Wallet...' : 'Generate New Wallet'}
           </Text>
+          {creationLoading ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : null}
         </TouchableOpacity>
       </View>
 

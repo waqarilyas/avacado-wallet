@@ -2,31 +2,24 @@ import 'react-native-gesture-handler';
 import 'react-native-get-random-values';
 
 import '@ethersproject/shims';
-
-import {} from '@instadapp/avocado';
 import {NavigationContainer} from '@react-navigation/native';
 import React from 'react';
-import {
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  useColorScheme
-} from 'react-native';
+import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
 
-import AppNavigator from './src/routes';
+import Toast from 'react-native-toast-message';
 import {WalletProvider} from './src/context/walletContext';
+import AppNavigator from './src/routes';
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle="dark-content" backgroundColor={'white'} />
       <WalletProvider>
         <NavigationContainer>
           <AppNavigator />
         </NavigationContainer>
       </WalletProvider>
+      <Toast />
     </SafeAreaView>
   );
 }
